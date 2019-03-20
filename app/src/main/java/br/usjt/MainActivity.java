@@ -1,6 +1,7 @@
 package br.usjt;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,17 +19,26 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private LocationListener locationListener;
     private LocationManager locationManager;
     private static final int REQUEST_CODE_GPS = 1001;
-    private TextView locationTextView;
+    //private TextView locationTextView;
+    private ListView locationListView;
     private double latitudeAtual;
     private double longitudeAtual;
+    ArrayList<String> lista;
+    Activity atividade;
+
 
 
     @Override
@@ -42,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
                 double lon = location.getLongitude();
                 latitudeAtual = lat;
                 longitudeAtual = lon;
-                locationTextView.setText(String.format("Lat: %f, Long: %f", lat, lon));
             }
 
             @Override
@@ -58,7 +67,13 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         setContentView(R.layout.activity_main);
-        locationTextView = findViewById(R.id.locationTextView);
+        //locationTextView = findViewById(R.id.locationTextView);
+        atividade = this;
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, lista);
+        locationListView = findViewById(R.id.locationListView);
+        locationListView.setAdapter(adapter);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -108,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             //a localização é obtida via hardware, intervalo de 0 segundos e 0 metros entre atualizações
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    0, 0, locationListener);
+                    120000, 200, locationListener);
         } else {
             //permissão ainda não foi nada, solicita ao usuário
             //quando o usuário responder, o método onRequestPermissionsResult vai ser chamado
@@ -133,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                         Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED) {
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                            0, 0, locationListener);
+                            120000, 200, locationListener);
                 }
             } else {
                 //usuário negou, não ativamos
